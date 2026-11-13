@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS } from '../../data/site-config';
+const lang = 'en';
+---
+<PageLayout title="Editorial policy Pegel Heute: sources, checks, corrections" description="How Pegel Heute works: only official PEGELONLINE raw data and legal texts, every reading with its time, tested calculations and corrections as soon as an error is reported." lang={lang} noindex={true} breadcrumbs={[{ label: 'Editorial policy' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Editorial policy</h1>
+    <p>Every number on this site comes from PEGELONLINE or is computed from it with a tested formula. Texts never type values by hand: they read them from the same snapshot as the tools, so text and tools cannot drift apart.</p>
+    <h2>Sources</h2>
+    <p>Primary sources only: the WSV's PEGELONLINE for water levels and reference values, gesetze-im-internet.de for the Rhine Police Regulations. Each page lists its sources at the bottom.</p>
+    <h2>Checks</h2>
+    <p>Automated tests check the rating, the trend, the fairway approximation and the marks against known cases on every change. {AUTHOR_NAME} rereads the sources at least every {REVIEW_CYCLE_MONTHS} months; the snapshot is renewed each time the site is rebuilt. Last check: {LAST_UPDATED}.</p>
+    <h2>Corrections</h2>
+    <p>A reported error is compared with the source and, if confirmed, fixed within days. Write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. See also the <a href={route('method', lang)}>method</a>.</p>
+    <h2>Independence</h2>
+    <p>No paid placement, no affiliate links. The site is not linked to any authority.</p>
+  </div>
+</PageLayout>

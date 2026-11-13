@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS } from '../../data/site-config';
+const lang = 'de';
+---
+<PageLayout title="Redaktionelle Grundsätze Pegel Heute: Quellen und Prüfung" description="Wie Pegel Heute arbeitet: nur amtliche Rohdaten von PEGELONLINE und Rechtstexte, jeder Wert mit Uhrzeit, getestete Rechnungen und Korrektur, sobald ein Fehler gemeldet wird." lang={lang} noindex={true} breadcrumbs={[{ label: 'Redaktionelle Grundsätze' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Redaktionelle Grundsätze</h1>
+    <p>Jede Zahl auf dieser Seite kommt aus PEGELONLINE oder wird mit einer getesteten Formel daraus berechnet. Texte tippen keine Werte von Hand ab: Sie lesen sie aus derselben Momentaufnahme wie die Werkzeuge, damit Text und Werkzeug nie auseinanderlaufen.</p>
+    <h2>Quellen</h2>
+    <p>Nur Primärquellen: PEGELONLINE der WSV für Wasserstände und Kennwerte, gesetze-im-internet.de für die Rheinschifffahrtspolizeiverordnung. Jede Seite nennt ihre Quellen am Ende.</p>
+    <h2>Prüfung</h2>
+    <p>Automatische Tests prüfen bei jeder Änderung die Einordnung, die Tendenz, die Fahrrinnen-Näherung und die Marken an bekannten Fällen. {AUTHOR_NAME} liest die Quellen mindestens alle {REVIEW_CYCLE_MONTHS} Monate neu, die Momentaufnahme wird bei jedem Neubau der Seite erneuert. Letzte Prüfung: {LAST_UPDATED}.</p>
+    <h2>Korrekturen</h2>
+    <p>Ein gemeldeter Fehler wird mit der Quelle verglichen und, wenn er bestätigt ist, in wenigen Tagen behoben. Schreiben Sie an <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Siehe auch die <a href={route('method', lang)}>Methodik</a>.</p>
+    <h2>Unabhängigkeit</h2>
+    <p>Keine bezahlten Platzierungen, keine Affiliate-Links. Die Seite ist mit keiner Behörde verbunden.</p>
+  </div>
+</PageLayout>

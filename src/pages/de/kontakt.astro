@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { contactPageSchema } from '../../lib/seo';
+const lang = 'de';
+const description = 'Melden Sie einen Pegelwert, einen Kennwert oder eine Erklärung, die falsch wirkt, oder fragen Sie, wie Sie einen Pegel kostenlos auf Ihrer eigenen Seite zeigen können.';
+---
+<PageLayout title="Kontakt Pegel Heute: Fehler melden oder Pegel einbinden" description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Kontakt', description, path: route('contact', lang), lang })]} breadcrumbs={[{ label: 'Kontakt' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Kontakt</h1>
+    <p>Per E-Mail, Antwort meist innerhalb einer Woche: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Etwas auf einer Seite stimmt nicht</h2>
+    <p>Nennen Sie die Seite, den Wert und, wenn möglich, die amtliche Quelle, die etwas anderes sagt. Wir vergleichen mit PEGELONLINE und korrigieren, wenn wir uns geirrt haben. Einen Messfehler an einem Pegel kann nur die WSV beheben.</p>
+    <h2>Einen Pegel auf Ihrer Seite zeigen</h2>
+    <p>Vereine, Häfen, Campingplätze und Lokalmedien können einen Pegel kostenlos einbinden: siehe <a href={route('widget', lang)}>Widget</a>.</p>
+    <h2>Wobei wir nicht helfen können</h2>
+    <p>Wir geben keine Hochwasserwarnungen, keine Vorhersagen und keine Auskunft, ob ein bestimmtes Grundstück betroffen ist. Wenden Sie sich dafür an die Hochwasserzentrale Ihres Landes oder Ihre Gemeinde.</p>
+  </div>
+</PageLayout>

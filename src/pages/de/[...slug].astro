@@ -1,0 +1,11 @@
+---
+/** Chaque page de station, de fleuve et de guide, version de. */
+import PegelPage from '../../components/PegelPage.astro';
+import { PAGES } from '../../lib/pages';
+import type { PageDef } from '../../lib/page-types';
+export function getStaticPaths() {
+  return PAGES.map((page) => ({ params: { slug: page.path.de }, props: { page } }));
+}
+const { page } = Astro.props as { page: PageDef };
+---
+<PegelPage page={page} lang="de" />

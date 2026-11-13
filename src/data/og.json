@@ -1,0 +1,20 @@
+{
+ "accent": "#0E5A8A",
+ "symbol": "≈",
+ "variants": [
+  {
+   "file": "og-de.png",
+   "title": "Pegel heute\nRhein, Elbe, Donau",
+   "subtitle": "Wert, Tendenz 24 h, Hochwassermarken · Kaub, Köln, Maxau, Dresden",
+   "badge": "Amtliche Rohdaten PEGELONLINE (WSV), DL-DE->Zero-2.0",
+   "brand": "Pegel Heute"
+  },
+  {
+   "file": "og-en.png",
+   "title": "German river levels today\nRhine, Elbe, Danube",
+   "subtitle": "Level, 24 h trend, flood marks · Kaub, Cologne, Maxau, Dresden",
+   "badge": "Official PEGELONLINE raw data (WSV), DL-DE->Zero-2.0",
+   "brand": "Pegel Heute"
+  }
+ ]
+}

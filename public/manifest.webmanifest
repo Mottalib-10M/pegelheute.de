@@ -1,0 +1,21 @@
+{
+ "name": "Pegel Heute",
+ "short_name": "Pegel Heute",
+ "description": "Pegelstände aktuell an Rhein, Elbe, Donau, Main, Mosel und Weser: Wert, Uhrzeit, Tendenz 24 h, Abstand zu Mittelwasser und Hochwassermarken je Station.",
+ "start_url": "/de/",
+ "display": "standalone",
+ "background_color": "#ffffff",
+ "theme_color": "#0E5A8A",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+---
+/** L'outil en tête d'une page : outil principal (pegel), classement (rangliste) ou mini-calcul. */
+import PegelTool from './pegel/PegelTool';
+import Rangliste from './pegel/Rangliste';
+import MiniSim from './calc/MiniSim';
+import { route } from '../i18n/routes';
+import { RIVERS, compactOf, allCompact, FETCHED_AT, type RiverId } from '../lib/pegel';
+import { SOURCES } from '../lib/helpers';
+import type { Lang } from '../lib/format';
+interface Props { kind: string; lang: Lang; river?: RiverId | 'alle'; initial?: string; idPrefix?: string; hideSelect?: boolean; miniHref?: string }
+const { kind, lang, river = 'alle', initial, idPrefix = 't', hideSelect = false, miniHref } = Astro.props;
+const rivers = Object.fromEntries(RIVERS.map((r) => [r.api, r[lang]]));
+const stations = river === 'alle' ? allCompact() : compactOf(river);
+const methodHref = route('method', lang);
+const warnHref = SOURCES(lang).hochwasserzentralen.url;
+---
+{kind === 'pegel' ? <PegelTool client:load lang={lang} stations={stations} initial={initial ?? stations[0].u} idPrefix={idPrefix} rivers={rivers} fetchedAt={FETCHED_AT} methodHref={methodHref} warnHref={warnHref} hideSelect={hideSelect} />
+  : kind.startsWith('rangliste') ? <Rangliste client:load lang={lang} stations={allCompact()} rivers={rivers} idPrefix={idPrefix} initialOrder={kind === 'rangliste-tief' ? 'tief' : 'hoch'} />
+  : kind.startsWith('mini:') ? <MiniSim client:load kind={kind.slice(5)} lang={lang} idPrefix={idPrefix} href={miniHref} />
+  : null}

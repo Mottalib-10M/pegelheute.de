@@ -1,0 +1,65 @@
+---
+/** Page de station, de fleuve ou de guide : H1, phrase chiffrée, mention d'indépendance, outil, courbe, réponse repliée, texte, FAQ, sources. */
+import PageLayout from '../layouts/PageLayout.astro';
+import Clamp from './Clamp.astro';
+import Tool from './Tool.astro';
+import Body from './Body.astro';
+import Verlauf from './pegel/Verlauf';
+import PegelTabelle from './pegel/PegelTabelle';
+import { route, hasRoute, type Locale } from '../i18n/routes';
+import { label, GROUPS } from '../i18n/nav';
+import { helpers, sourceList, SOURCES } from '../lib/helpers';
+import { articleSchema, faqSchema, breadcrumbSchema, webPageSchema, webApplicationSchema } from '../lib/seo';
+import { AUTHOR_NAME } from '../data/site-config';
+import type { PageDef } from '../lib/page-types';
+import { pageById, PAGES } from '../lib/pages';
+import { FEATURED, featuredById, riverById, raw, compact, compactOf, series, RIVERS, type RiverId } from '../lib/pegel';
+interface Props { page: PageDef; lang: Locale }
+const { page, lang } = Astro.props;
+const x = page[lang];
+const h = helpers(lang);
+const path = route(page.id, lang);
+const grp = GROUPS.find((g) => ({ station: 'stationen', river: 'fluesse', guide: 'wissen' } as const)[page.kind] === g.id)!;
+const faqs = x.faqs(h);
+const jsonLd = [webApplicationSchema({ name: x.h1, description: x.description, path, lang }), articleSchema({ title: x.h1, description: x.description, path, lang }), webPageSchema({ name: x.h1, description: x.description, path, lang })];
+const crumbs: Array<{ label: string; href?: string }> = [];
+let riverId: RiverId | undefined;
+let stationUuid: string | undefined;
+if (page.kind === 'station') {
+  const f = featuredById(page.ref!); riverId = f.river; stationUuid = raw(f.api).uuid;
+  crumbs.push({ label: riverById(f.river)[lang], href: route(`fl-${f.river}`, lang) }, { label: x.nav });
+  jsonLd.push(breadcrumbSchema([{ name: lang === 'de' ? 'Start' : 'Home', path: route('home', lang) }, { name: riverById(f.river)[lang], path: route(`fl-${f.river}`, lang) }, { name: x.nav, path }]));
+} else {
+  if (page.kind === 'river') riverId = page.ref as RiverId;
+  crumbs.push({ label: grp.label[lang] }, { label: x.nav });
+  jsonLd.push(breadcrumbSchema([{ name: lang === 'de' ? 'Start' : 'Home', path: route('home', lang) }, { name: x.nav, path }]));
+}
+if (faqs.length) jsonLd.push(faqSchema(faqs, lang));
+const related = page.related.filter((id) => hasRoute(id, lang)).map((id) => ({ href: route(id, lang), name: label(id, lang), description: pageById(id)?.[lang]?.card ?? '' }));
+const sources = sourceList(page.sources, lang);
+const featuredLinks = Object.fromEntries(FEATURED.map((f) => [raw(f.api).uuid, route(`st-${f.id}`, lang)]));
+const initial = stationUuid ?? (riverId ? (FEATURED.find((f) => f.river === riverId) ? raw(FEATURED.find((f) => f.river === riverId)!.api).uuid : compactOf(riverId)[Math.floor(compactOf(riverId).length / 2)].u) : undefined);
+const st = stationUuid ? compact(raw(featuredById(page.ref!).api)) : undefined;
+const indep = { de: 'Unabhängige Seite, kein Angebot der WSV oder einer Behörde. Hochwasserwarnungen finden Sie bei den', en: 'Independent site, not a service of the WSV or any authority. Flood warnings are issued by the' }[lang];
+const indep2 = { de: 'Hochwasserzentralen der Länder', en: 'German state flood centres' }[lang];
+const miniHref = route('home', lang);
+const rivApi = riverId ? riverById(riverId).api : undefined;
+const capt = riverId ? { de: `Alle ${compactOf(riverId).length} Pegel mit Wasserstand ${riverId === 'rhein' || riverId === 'main' ? 'am' : 'an der'} ${riverById(riverId).de}, in Fließrichtung.`, en: `All ${compactOf(riverId).length} gauges with a water level on the ${riverById(riverId).en}, in the direction of flow.` }[lang] : '';
+---
+<PageLayout title={x.title} description={x.description} lang={lang} jsonLd={jsonLd} faqs={faqs} related={related} sources={sources} breadcrumbs={crumbs}>
+  <article>
+    <header class="mb-4">
+      <h1 class="text-[1.7rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">{x.h1}</h1>
+      <p class="mt-2 text-base text-navy-700 sm:text-lg" set:html={x.intro(h)} />
+      <p data-chrome class="mt-1 text-sm text-navy-600">{indep} <a href={SOURCES(lang).hochwasserzentralen.url} target="_blank" rel="nofollow noopener" class="underline">{indep2}</a>.</p>
+    </header>
+    <div data-outil data-chrome class="mb-4">
+      <Tool kind={page.tool} lang={lang} river={page.kind === 'guide' ? 'alle' : riverId} initial={initial} idPrefix={`p${page.order}`} miniHref={miniHref} />
+    </div>
+    {st && stationUuid && <Verlauf client:visible lang={lang} uuid={stationUuid} serie={series(stationUuid)} kenn={st} name={x.nav} />}
+    <p class="mb-6 text-sm text-navy-600">{lang === 'de' ? 'Erstellt von' : 'Prepared by'} <a href={route('about', lang)} class="underline hover:text-navy-900">{AUTHOR_NAME}</a> · <a href={route('method', lang)} class="underline hover:text-navy-900">{label('method', lang)}</a> · {lang === 'de' ? 'Momentaufnahme' : 'snapshot'} {h.snap}</p>
+    <Clamp text={x.resume(h)} lang={lang} id={`clamp-${page.id}`} class="mb-8" />
+    <Body html={x.body(h)} href={miniHref} lang={lang} />
+    {page.kind === 'river' && rivApi && riverId && <div data-chrome><PegelTabelle client:visible lang={lang} stations={compactOf(riverId)} waters={[rivApi]} links={featuredLinks} caption={capt} /></div>}
+  </article>
+</PageLayout>

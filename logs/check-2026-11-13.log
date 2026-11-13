@@ -1,0 +1,117 @@
+
+> pegelheute.de@0.1.0 check
+> npm run build && npx vitest run && node scripts/typo-nbsp.mjs dist --check && node scripts/check-legal.mjs && python3 scripts/check-seo.py . && python3 scripts/check-unique.py . && python3 scripts/check-trame.py . && python3 scripts/check-liens.py . && node scripts/check-layout.mjs . && node scripts/check-sources.mjs . && python3 scripts/check-simulateurs.py . && python3 scripts/check-hreflang.py . && python3 scripts/check-anglais.py . && python3 scripts/check-portefeuille.py . && python3 scripts/check-cookies.py . && node scripts/check-url-propre.mjs . && node scripts/check-premier-ecran.mjs . && node scripts/check-droits.mjs . && node scripts/check-copie.mjs . && node scripts/check-nombres.mjs . && node scripts/check-contraste.mjs . && node scripts/check-saisie.mjs . && python3 scripts/check-regles.py . && python3 scripts/check-motcle.py .
+
+
+> pegelheute.de@0.1.0 build
+> astro build && node scripts/typo-nbsp.mjs && python3 scripts/check-snippets.py dist
+
+10:21:35 [types] Generated 19ms
+10:21:35 [build] output: "static"
+10:21:35 [build] mode: "static"
+10:21:35 [build] directory: /Users/mottalib/Documents/GitHub/a-publier/Mottalib-10M/pegelheute.de/dist/
+10:21:35 [build] Collecting build info...
+10:21:35 [build] ✓ Completed in 40ms.
+10:21:35 [build] Building static entrypoints...
+10:21:38 [vite] ✓ built in 2.92s
+10:21:39 [vite] ✓ built in 608ms
+10:21:39 [build] Rearranging server assets...
+
+ generating static routes 
+10:21:39   ├─ /404.html (+12ms) 
+10:21:39   ├─ /de/cookies/index.html (+4ms) 
+10:21:39   ├─ /de/datenschutz/index.html (+3ms) 
+10:21:39   ├─ /de/impressum/index.html (+3ms) 
+10:21:39   ├─ /de/kontakt/index.html (+3ms) 
+10:21:39   ├─ /de/methodik/index.html (+4ms) 
+10:21:39   ├─ /de/redaktionelle-grundsaetze/index.html (+3ms) 
+10:21:39   ├─ /de/ueber-uns/index.html (+3ms) 
+10:21:39   ├─ /de/widget/index.html (+4ms) 
+10:21:39   ├─ /de/index.html (+36ms) 
+10:21:39   ├─ /de/rhein/index.html (+18ms) 
+10:21:39   ├─ /de/elbe/index.html (+30ms) 
+10:21:39   ├─ /de/donau/index.html (+12ms) 
+10:21:39   ├─ /de/main/index.html (+12ms) 
+10:21:39   ├─ /de/mosel/index.html (+16ms) 
+10:21:39   ├─ /de/weser/index.html (+16ms) 
+10:21:39   ├─ /de/rhein/maxau/index.html (+8ms) 
+10:21:39   ├─ /de/rhein/mainz/index.html (+11ms) 
+10:21:39   ├─ /de/rhein/kaub/index.html (+7ms) 
+10:21:39   ├─ /de/rhein/koblenz/index.html (+6ms) 
+10:21:39   ├─ /de/rhein/bonn/index.html (+6ms) 
+10:21:39   ├─ /de/rhein/koeln/index.html (+5ms) 
+10:21:39   ├─ /de/rhein/duesseldorf/index.html (+8ms) 
+10:21:39   ├─ /de/rhein/emmerich/index.html (+13ms) 
+10:21:39   ├─ /de/elbe/dresden/index.html (+10ms) 
+10:21:39   ├─ /de/elbe/magdeburg/index.html (+8ms) 
+10:21:39   ├─ /de/donau/passau/index.html (+9ms) 
+10:21:39   ├─ /de/main/wuerzburg/index.html (+6ms) 
+10:21:39   ├─ /de/hochwasser-aktuell/index.html (+11ms) 
+10:21:39   ├─ /de/niedrigwasser-rhein/index.html (+4ms) 
+10:21:39   ├─ /de/pegel-lesen/index.html (+4ms) 
+10:21:39   ├─ /de/hochwassermarken/index.html (+5ms) 
+10:21:39   ├─ /embed/de/pegel/index.html (+9ms) 
+10:21:39   ├─ /embed/en/pegel/index.html (+11ms) 
+10:21:39   ├─ /en/about/index.html (+3ms) 
+10:21:39   ├─ /en/contact/index.html (+3ms) 
+10:21:39   ├─ /en/cookies/index.html (+3ms) 
+10:21:39   ├─ /en/editorial-policy/index.html (+3ms) 
+10:21:39   ├─ /en/legal-notice/index.html (+2ms) 
+10:21:39   ├─ /en/method/index.html (+3ms) 
+10:21:39   ├─ /en/privacy/index.html (+3ms) 
+10:21:39   ├─ /en/widget/index.html (+2ms) 
+10:21:39   ├─ /en/index.html (+14ms) 
+10:21:39   ├─ /en/rhine/index.html (+14ms) 
+10:21:39   ├─ /en/elbe/index.html (+25ms) 
+10:21:39   ├─ /en/danube/index.html (+11ms) 
+10:21:39   ├─ /en/main/index.html (+7ms) 
+10:21:39   ├─ /en/moselle/index.html (+15ms) 
+10:21:39   ├─ /en/weser/index.html (+16ms) 
+10:21:39   ├─ /en/rhine/maxau/index.html (+8ms) 
+10:21:39   ├─ /en/rhine/mainz/index.html (+11ms) 
+10:21:39   ├─ /en/rhine/kaub/index.html (+5ms) 
+10:21:39   ├─ /en/rhine/koblenz/index.html (+5ms) 
+10:21:39   ├─ /en/rhine/bonn/index.html (+5ms) 
+10:21:39   ├─ /en/rhine/cologne/index.html (+5ms) 
+10:21:39   ├─ /en/rhine/duesseldorf/index.html (+5ms) 
+10:21:39   ├─ /en/rhine/emmerich/index.html (+6ms) 
+10:21:39   ├─ /en/elbe/dresden/index.html (+10ms) 
+10:21:39   ├─ /en/elbe/magdeburg/index.html (+7ms) 
+10:21:39   ├─ /en/danube/passau/index.html (+8ms) 
+10:21:39   ├─ /en/main/wuerzburg/index.html (+5ms) 
+10:21:39   ├─ /en/flood-levels-now/index.html (+11ms) 
+10:21:39   ├─ /en/rhine-low-water/index.html (+4ms) 
+10:21:39   ├─ /en/reading-a-gauge/index.html (+3ms) 
+10:21:39   ├─ /en/flood-marks-shipping/index.html (+5ms) 
+10:21:39   ├─ /llms.txt (+1ms) 
+10:21:39   ├─ /index.html (+5ms) 
+10:21:39 ✓ Completed in 609ms.
+
+10:21:39 [build] ✓ Completed in 4.19s.
+10:21:39 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+10:21:39 [build] 66 page(s) built in 4.26s
+10:21:39 [build] Complete!
+typo-nbsp: 40 espace(s) rendue(s) insécable(s) dans 12 page(s)
+check-snippets : 50 pages indexables, titres 50-60, descriptions 150-160, ordre des mots et unicite conformes
+
+ RUN  v4.1.12 /Users/mottalib/Documents/GitHub/a-publier/Mottalib-10M/pegelheute.de
+
+
+ Test Files  2 passed (2)
+      Tests  47 passed (47)
+   Start at  10:21:40
+   Duration  481ms (transform 257ms, setup 0ms, import 343ms, tests 100ms, environment 0ms)
+
+typo-nbsp: 0 espace(s) à corriger dans 0 page(s)
+typo-nbsp: 0 décimale(s) avec un point dans une langue à virgule
+typo-nbsp: 0 pourcentage(s) écrit(s) mal placé(s) : « 20 % » là où la langue écrit « 20% », ou après le nombre en turc, qui écrit « %20 » (souvent dans un composant React : corriger la source)
+typo-nbsp: 0 mot(s) français sans accent ou avec un accent faux
+Identité légale complète, aucune mention provisoire.
+. : 50 pages indexables, 0 à corriger
+
+. : 50 pages comparées, 0 paire(s) trop proches, 0 question(s) recyclée(s)
+
+. : 65 pages, 0 à corriger, 0 question(s) de FAQ recyclée(s)
+. : 69 pages, 0 cible(s) morte(s), 0 lien(s) a corriger, 0 route(s) vide(s)
+check-layout: 50 pages × 4 largeurs, 1 défaut(s)
+  [mobile] /de/hochwassermarken/ — débordement horizontal de 99 px

@@ -1,0 +1,41 @@
+---
+/** Methodik : Quelle, Momentaufnahme und Live-Abruf, Einordnung, Tendenz, Verlängerung, Fahrrinne, Wasserspiegel, Rangliste, Grenzen. */
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { srcLink } from '../../lib/helpers';
+import { breadcrumbSchema, webPageSchema } from '../../lib/seo';
+import { SEUIL_STABLE } from '../../lib/engine/pegel';
+import { FETCHED_AT, RAW_STATIONS } from '../../lib/pegel';
+import { quand } from '../../lib/live';
+const lang = 'de';
+const path = route('method', lang);
+const title = 'Pegelstände berechnet: Methodik, Datenquelle und Tendenz';
+const description = 'Wie Pegel Heute rechnet: PEGELONLINE-Rohdaten, Momentaufnahme und Live-Abruf, Einordnung nach MNW, MW, MHW und Marken, Tendenz 24 h, Fahrrinne und Grenzen.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[webPageSchema({ name: title, description, path, lang }), breadcrumbSchema([{ name: 'Start', path: route('home', lang) }, { name: 'Methodik', path }])]} breadcrumbs={[{ label: 'Methodik' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>Methodik: so rechnet Pegel Heute</h1>
+    <p>Alle Werkzeuge nutzen eine Rechenlogik, die in Ihrem Browser läuft. Für jeden Teil steht hier, was wir tun, woher die Zahl kommt und wo die Grenze liegt. Letzte Momentaufnahme: {quand(FETCHED_AT, lang)}.</p>
+    <h2>Quelle und Lizenz</h2>
+    <p>Wasserstände, Pegelnullpunkte und Kennwerte stammen aus der <Fragment set:html={s('pegelonline-api', 'REST-Schnittstelle von PEGELONLINE')} /> der Wasserstraßen- und Schifffahrtsverwaltung des Bundes. Die Daten stehen unter der <Fragment set:html={s('dl-de-zero', 'Datenlizenz Deutschland – Zero – Version 2.0')} /> (<Fragment set:html={s('pegelonline-nutzung', 'Nutzungsbedingungen')} />). Es sind ungeprüfte Rohdaten. Wir zeigen {RAW_STATIONS.length} Pegel mit Wasserstand an Rhein, Elbe, Donau, Main, Mosel und Weser.</p>
+    <h2>Momentaufnahme und Live-Abruf</h2>
+    <p>Beim Erstellen der Seite fragt ein Skript alle Stationen ab und speichert den aktuellen Wert, den Wert von vor 24 Stunden und für zwölf Stationen den Verlauf von 30 Tagen als Mittel über zwei Stunden. Das ist die Momentaufnahme im HTML. Beim Öffnen einer Seite fragt Ihr Browser PEGELONLINE direkt: für die gewählte Station die Messwerte der letzten 24 Stunden, für Tabellen die aktuellen Werte aller Stationen eines Flusses in einer Abfrage, für Verläufe die letzten 30 Tage. Neben jedem Wert steht, ob er live gelesen ist oder aus der Momentaufnahme stammt, immer mit Uhrzeit (deutsche Zeit).</p>
+    <h2>Einordnung</h2>
+    <p>Ein Wert wird von oben nach unten geprüft: auf oder über dem höchsten bekannten Stand (HHW), über Hochwassermarke II, über Marke I, über mittlerem Hochwasser (MHW); dann auf oder unter dem niedrigsten bekannten Stand (NNW), auf oder unter mittlerem Niedrigwasser (MNW); sonst über oder unter Mittelwasser (MW). Geprüft wird nur, was PEGELONLINE für die Station veröffentlicht. Ohne Kennwerte steht „ohne amtliche Kennwerte“.</p>
+    <h2>Tendenz über 24 Stunden</h2>
+    <p>Die Tendenz ist der letzte Wert minus der erste Wert der vergangenen 24 Stunden. Unter {SEUIL_STABLE} cm Änderung schreiben wir „etwa gleichbleibend“, weil Wellenschlag und Messrauschen in dieser Größenordnung liegen. Fehlt ein Wert von vor 23 Stunden oder mehr, schreiben wir „Tendenz unbekannt“.</p>
+    <h2>„Bei gleicher Änderung erreicht in“</h2>
+    <p>Für Ihren Vergleichswert verlängern wir die Änderung der letzten 24 Stunden geradlinig: Stunden = (Ihr Wert − aktueller Wert) ÷ Änderung in 24 h × 24. Steigt das Wasser nicht, steht „nicht in Sicht“. Das ist keine Vorhersage: Hochwasserwellen flachen ab. Vorhersagen veröffentlichen die <Fragment set:html={s('hochwasserzentralen', 'Hochwasserzentralen der Länder')} /> und für die Schifffahrt <Fragment set:html={s('elwis', 'ELWIS')} />.</p>
+    <h2>Fahrrinnentiefe am Rhein</h2>
+    <p>Wo PEGELONLINE den gleichwertigen Wasserstand (GlW) und die verkehrsgesicherte Fahrrinnentiefe unter GlW (TuGLW) angibt, rechnen wir: Fahrrinnentiefe ≈ TuGLW + (Pegelwert − GlW). Die Näherung setzt voraus, dass sich der Wasserspiegel an der Engstelle so bewegt wie am Pegel. Sie ersetzt keine Peilung und keine Angabe der WSV.</p>
+    <h2>Wasserspiegel über NHN</h2>
+    <p>Wasserspiegel = Pegelnullpunkt (PNP, in m über NHN) + Pegelwert ÷ 100. Der Nullpunkt und sein Gültigkeitsdatum kommen aus PEGELONLINE.</p>
+    <h2>Hochwassermarken</h2>
+    <p>Die Marken I und II und ihre Folgen für die Schifffahrt am Rhein folgen der <Fragment set:html={s('rheinschpv', 'RheinSchPV § 10.01')} />; die Werte stimmen mit denen in PEGELONLINE überein. An anderen Flüssen zeigen wir veröffentlichte Marken als Abstand, ohne Rechtsfolge.</p>
+    <h2>Rangliste</h2>
+    <p>Um Stationen mit verschiedener Skala zu vergleichen, rechnen wir den Anteil = (Wert − MNW) ÷ (MHW − MNW). 0 % ist mittleres Niedrigwasser, 100 % mittleres Hochwasser; Werte darunter oder darüber sind möglich. Stationen ohne MNW oder MHW fehlen in der Rangliste.</p>
+    <h2>Grenzen</h2>
+    <p>Keine Warnung, keine Vorhersage, keine Aussage über Grundstücke. Nur Bundespegel an sechs Flüssen. Messfehler und Lücken der Rohdaten übernehmen wir, wie sie sind.</p>
+  </article>
+</PageLayout>

@@ -1,0 +1,12 @@
+# PEGELONLINE : système officiel des niveaux d'eau de la WSV (administration fédérale des voies navigables)
+pegelonline.wsv.de
+# WSV : Wasserstraßen- und Schifffahrtsverwaltung des Bundes, l'autorité qui exploite les pegels
+wsv.de
+# ELWIS : service d'information électronique de la WSV pour la navigation (niveaux, prévisions, avis)
+elwis.de
+# Hochwasserzentralen : portail commun des services de prévision des crues des Länder
+hochwasserzentralen.de
+# HND Bayern : service d'annonce des crues de l'Office bavarois de l'environnement (LfU)
+hnd.bayern.de
+# GovData : portail open data fédéral, éditeur du texte de la licence DL-DE->Zero-2.0
+govdata.de

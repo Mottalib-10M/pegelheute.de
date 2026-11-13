@@ -1,0 +1,32 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, AUTHOR_DESC, CONTACT_EMAIL, SITE_NAMES } from '../../data/site-config';
+import { srcLink } from '../../lib/helpers';
+import { profilePageSchema, breadcrumbSchema } from '../../lib/seo';
+const lang = 'de';
+const path = route('about', lang);
+const title = 'Pegel Heute: Herausgeber, Datenquelle und Unabhängigkeit';
+const description = 'Wer Pegel Heute macht: Radif Partners, unabhängig von WSV, Ländern und Behörden. Woher die Wasserstände kommen, was die Seite zeigt und was sie nicht leistet.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[profilePageSchema({ path, lang }), breadcrumbSchema([{ name: 'Start', path: route('home', lang) }, { name: 'Über uns', path }])]} breadcrumbs={[{ label: 'Über uns' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>Über {SITE_NAMES[lang]}</h1>
+    <p>{AUTHOR_DESC.de}</p>
+    <h2>Warum es diese Seite gibt</h2>
+    <p>Wer im Herbst 2026 „Pegel Kaub“ oder „Pegel Köln“ suchte, fand vor allem Nachrichten mit einer Zahl ohne Uhrzeit, Kurven ohne Wert im Text und Karten. Die amtlichen Daten sind offen, aber schwer zu lesen. Diese Seite stellt jeden Wert mit Messzeit, Tendenz über 24 Stunden und den Kennwerten seiner Station dar und erklärt, was zum Beispiel GlW, MHW oder Hochwassermarke II bedeuten.</p>
+    <h2>Wer sie herausgibt</h2>
+    <p>Herausgeber ist {AUTHOR_NAME}, ein Unternehmen, das Rechner und Übersichten auf Grundlage öffentlicher Daten baut. {AUTHOR_NAME} ist keine Behörde, hat keine Verbindung zur WSV, zu einem Land oder einer Hochwasserzentrale und verwendet keine amtlichen Logos. Die Seite verkauft nichts und enthält keine Affiliate-Links.</p>
+    <LegalIdentity lang={lang} />
+    <h2>Woher die Daten kommen</h2>
+    <p>Alle Wasserstände und Kennwerte stammen aus <Fragment set:html={s('pegelonline', 'PEGELONLINE')} />, veröffentlicht unter der <Fragment set:html={s('dl-de-zero', 'Datenlizenz Deutschland – Zero – Version 2.0')} />. Die Hochwassermarken am Rhein folgen der <Fragment set:html={s('rheinschpv', 'RheinSchPV § 10.01')} />. Wie gerechnet wird, steht in der <a href={route('method', lang)}>Methodik</a>; wie wir Fehler korrigieren, in den <a href={route('editorial', lang)}>redaktionellen Grundsätzen</a>.</p>
+    <h2>Ihre Daten</h2>
+    <p>Ihr Browser lädt die Pegelwerte direkt bei PEGELONLINE. Was Sie in die Werkzeuge eingeben, bleibt in Ihrem Browser und wird nicht gespeichert; es gibt kein Konto. Siehe <a href={route('privacy', lang)}>Datenschutz</a>.</p>
+    <h2>Was die Seite nicht leistet</h2>
+    <p>Sie warnt nicht vor Hochwasser und sagt keine Wasserstände voraus. Dafür sind die Hochwasserzentralen der Länder zuständig, für die Schifffahrt ELWIS.</p>
+    <h2>Schreiben Sie uns</h2>
+    <p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, wenn ein Wert oder eine Erklärung falsch ist.</p>
+  </article>
+</PageLayout>

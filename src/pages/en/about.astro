@@ -1,0 +1,32 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, AUTHOR_DESC, CONTACT_EMAIL, SITE_NAMES } from '../../data/site-config';
+import { srcLink } from '../../lib/helpers';
+import { profilePageSchema, breadcrumbSchema } from '../../lib/seo';
+const lang = 'en';
+const path = route('about', lang);
+const title = 'Pegel Heute: publisher, data source and independence';
+const description = 'Who makes Pegel Heute: Radif Partners, independent of the WSV, the states and any authority. Where the water levels come from and what the site does not do.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[profilePageSchema({ path, lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'About', path }])]} breadcrumbs={[{ label: 'About' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>About {SITE_NAMES[lang]}</h1>
+    <p>{AUTHOR_DESC.en}</p>
+    <h2>Why this site exists</h2>
+    <p>Searching for the Kaub or Cologne gauge in autumn 2026 mostly turned up news items with a number and no time, curves with no value in the text, and maps. The official data is open but hard to read. This site shows every reading with its time, its 24-hour trend and its station's reference values, and explains what GlW, MHW or flood mark II actually mean.</p>
+    <h2>Who publishes it</h2>
+    <p>The publisher is {AUTHOR_NAME}, a company that builds calculators and overviews on public data. {AUTHOR_NAME} is not an authority, has no tie to the WSV, any German state or flood centre, and uses no official logos. The site sells nothing and carries no affiliate links.</p>
+    <LegalIdentity lang={lang} />
+    <h2>Where the data comes from</h2>
+    <p>All water levels and reference values come from <Fragment set:html={s('pegelonline', 'PEGELONLINE')} />, published under the <Fragment set:html={s('dl-de-zero', 'Data licence Germany – Zero – version 2.0')} />. Rhine flood marks follow <Fragment set:html={s('rheinschpv', 'RheinSchPV § 10.01')} />. How we calculate is on the <a href={route('method', lang)}>method</a> page; how we fix errors, in the <a href={route('editorial', lang)}>editorial policy</a>.</p>
+    <h2>Your data</h2>
+    <p>Your browser loads the readings straight from PEGELONLINE. What you enter in the tools stays in your browser and is not stored; there is no account. See the <a href={route('privacy', lang)}>privacy policy</a>.</p>
+    <h2>What the site does not do</h2>
+    <p>It does not warn of floods and does not forecast levels. That is the job of the state flood centres and, for shipping, ELWIS.</p>
+    <h2>Write to us</h2>
+    <p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> if a value or an explanation is wrong.</p>
+  </article>
+</PageLayout>

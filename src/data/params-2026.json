@@ -1,0 +1,16 @@
+{
+  "_lisezmoi": "Sources du site, relues le 2026-11-13. Les valeurs de pegel ne vivent pas ici : elles viennent de src/data/pegel.json (scripts/fetch-pegel.mjs, PEGELONLINE) et du navigateur (lecture directe de PEGELONLINE).",
+  "year": 2026,
+  "retrieved_at": "2026-11-13",
+  "sources": {
+    "pegelonline": { "url": "https://www.pegelonline.wsv.de/gast/start", "label": { "de": "PEGELONLINE – Gewässerkundliches Informationssystem der WSV", "en": "PEGELONLINE – hydrological information system of the WSV" } },
+    "pegelonline-api": { "url": "https://www.pegelonline.wsv.de/webservice/dokuRestapi", "label": { "de": "PEGELONLINE – Dokumentation der REST-API v2", "en": "PEGELONLINE – REST API v2 documentation" } },
+    "pegelonline-nutzung": { "url": "https://www.pegelonline.wsv.de/gast/nutzungsbedingungen", "label": { "de": "PEGELONLINE – Nutzungsbedingungen (Lizenz DL-DE->Zero-2.0)", "en": "PEGELONLINE – terms of use (licence DL-DE->Zero-2.0)" } },
+    "dl-de-zero": { "url": "https://www.govdata.de/dl-de/zero-2-0", "label": { "de": "GovData – Datenlizenz Deutschland – Zero – Version 2.0", "en": "GovData – Data licence Germany – Zero – version 2.0" } },
+    "rheinschpv": { "url": "https://www.gesetze-im-internet.de/rheinschpv_1994/__10_01.html", "label": { "de": "RheinSchPV § 10.01 – Beschränkung der Schifffahrt bei Hochwasser", "en": "Rhine Police Regulations (RheinSchPV) § 10.01 – navigation restrictions at high water" } },
+    "elwis": { "url": "https://www.elwis.de/DE/dynamisch/gewaesserkunde/wasserstaende/index.php", "label": { "de": "ELWIS – Wasserstände und Vorhersagen für die Schifffahrt", "en": "ELWIS – water levels and forecasts for shipping" } },
+    "hochwasserzentralen": { "url": "https://www.hochwasserzentralen.de/", "label": { "de": "Länderübergreifendes Hochwasserportal (Hochwasserzentralen der Länder)", "en": "Cross-state flood portal of the German states (Hochwasserzentralen)" } },
+    "hnd-bayern": { "url": "https://www.hnd.bayern.de/", "label": { "de": "Hochwassernachrichtendienst Bayern (LfU)", "en": "Bavarian Flood Information Service (LfU)" } },
+    "wsv": { "url": "https://www.wsv.de/", "label": { "de": "Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)", "en": "Federal Waterways and Shipping Administration (WSV)" } }
+  }
+}

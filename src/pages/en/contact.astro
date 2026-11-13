@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { contactPageSchema } from '../../lib/seo';
+const lang = 'en';
+const description = 'Tell us about a gauge reading, a reference value or an explanation that looks wrong, or ask how to show a German river gauge for free on your own website.';
+---
+<PageLayout title="Contact Pegel Heute: report an error or embed a gauge" description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path: route('contact', lang), lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>By email, usually answered within a week: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Something on a page is wrong</h2>
+    <p>Name the page, the value and, if you have it, the official source that says otherwise. We compare it with PEGELONLINE and correct the page if we made a mistake. A measuring fault at a gauge can only be fixed by the WSV.</p>
+    <h2>Showing a gauge on your site</h2>
+    <p>Clubs, marinas, campsites and local media can embed a gauge for free: see <a href={route('widget', lang)}>widget</a>.</p>
+    <h2>What we cannot help with</h2>
+    <p>We give no flood warnings, no forecasts and no view on whether a particular property is at risk. Ask your state's flood centre or your municipality.</p>
+  </div>
+</PageLayout>
