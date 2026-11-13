@@ -78,7 +78,7 @@ const SPECS: Record<string, (lang: string) => MiniSpec> = {
         const k2 = { m1: s.m1 ?? undefined, m2: s.m2 ?? undefined };
         const st = schifffahrt(v.w, k2);
         const a1 = abstand(v.w, k2.m1)!, a2 = abstand(v.w, k2.m2);
-        const txt = { frei: en ? 'No high-water restriction' : 'Keine Hochwasserbeschränkung', eingeschraenkt: en ? 'Restricted (between mark I and II)' : 'Eingeschränkt (zwischen Marke I und II)', gesperrt: en ? 'Prohibited (mark II reached)' : 'Verboten (Marke II erreicht)', ohneMarken: '–' }[st];
+        const txt = { frei: en ? 'No restriction (below mark I)' : 'Frei (unter Marke I)', eingeschraenkt: en ? 'Restricted (between mark I and II)' : 'Eingeschränkt (zwischen Marke I und II)', gesperrt: en ? 'Prohibited (mark II reached)' : 'Verboten (Marke II erreicht)', ohneMarken: '–' }[st];
         return { head: [en ? 'Shipping on this section' : 'Schifffahrt auf diesem Abschnitt', txt],
           rows: [[en ? 'Mark I' : 'Marke I', cm(s.m1!, en)], [en ? 'Distance to mark I' : 'Abstand zu Marke I', a1 > 0 ? cm(a1, en) : (en ? 'reached' : 'erreicht')], [en ? 'Mark II' : 'Marke II', s.m2 === null ? '–' : cm(s.m2, en)], [en ? 'Distance to mark II' : 'Abstand zu Marke II', a2 === null ? '–' : a2 > 0 ? cm(a2, en) : (en ? 'reached' : 'erreicht')]],
           note: en ? 'Marks and rules: RheinSchPV § 10.01, values as published by PEGELONLINE.' : 'Marken und Regeln: RheinSchPV § 10.01, Werte wie bei PEGELONLINE veröffentlicht.' };

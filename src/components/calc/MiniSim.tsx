@@ -60,7 +60,7 @@ export default function MiniSim({ kind, lang = 'en', href, title, idPrefix = 'm'
   return (
     <div data-chrome data-mini={kind} className="not-prose rechner-mini my-8 rounded-xl border border-accent-200 bg-white p-4 shadow-sm sm:p-5">
       <p className="text-base font-semibold text-navy-900">{title ?? spec.title}</p>
-      <div className="mt-3 grid gap-5 sm:grid-cols-2">
+      <div className="mt-3 grid gap-5 sm:grid-cols-2 [&>*]:min-w-0">
         <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
           {visibles.filter((i) => !i.avance).map(champ)}
           {avances.length > 0 && (
