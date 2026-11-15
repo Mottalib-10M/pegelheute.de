@@ -23,7 +23,9 @@
  *   (« Set by this page: State: Texas ») ; leur valeur vient de `defaults`, sinon de `def` ;
  * - `showIf` d'un champ : caché quand il ne change rien ; une valeur en mots longue passe sous son libellé.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ensureLive } from '../../lib/live';
+import { useLiveReader } from '../../lib/use-live';
 import NumberField from '../ui/NumberField';
 import SelectField from '../ui/SelectField';
 import { getSpec } from '../../lib/mini-specs';
@@ -43,9 +45,17 @@ export const valeurEnMots = (x: string) => x.length > 12 && /\p{L}{3}/u.test(x);
 
 export default function MiniSim({ kind, lang = 'en', href, title, idPrefix = 'm', defaults = {}, saisiParLeLecteur = false, locked = [], exemple }: Props) {
   const spec = getSpec(kind, lang);
-  const [v, setV] = useState<Record<string, number>>(() => Object.fromEntries(spec.inputs.map((i) => [i.id, defaults[i.id] ?? i.def])));
+  const [v0, setV] = useState<Record<string, number>>(() => Object.fromEntries(spec.inputs.map((i) => [i.id, defaults[i.id] ?? i.def])));
   const [touched, setTouched] = useState<Record<string, boolean>>(() => (saisiParLeLecteur ? Object.fromEntries(spec.inputs.map((i) => [i.id, true])) : {}));
-  const out = useMemo(() => spec.run(v, touched), [v, spec, touched]);
+  // Valeur live (pegelheute.de, 2026-11-14) : le champ du niveau suit la lecture live de la station tant que le
+  // lecteur ne l'a pas tapé ; c'est la même lecture que le chapeau et la boîte live de la page.
+  const lire = useLiveReader();
+  const lu = spec.live?.uuid(v0);
+  useEffect(() => { if (lu) ensureLive(lu); }, [lu]);
+  const lw = lu ? lire(lu) : undefined;
+  const lv = spec.live && !touched[spec.live.wert] ? lw?.v ?? spec.live.snap(v0) : undefined;
+  const v = spec.live && lv !== undefined ? { ...v0, [spec.live.wert]: lv } : v0;
+  const out = useMemo(() => spec.run(v, touched), [JSON.stringify(v), spec, touched]);
   const set = (id: string) => (x: number) => { setV((o) => ({ ...o, [id]: x })); setTouched((o) => (o[id] ? o : { ...o, [id]: true })); };
   const fid = (id: string) => `${idPrefix}-${kind}-${id}`;
   const lib = libellesTrame(lang);

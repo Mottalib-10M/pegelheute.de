@@ -11,10 +11,16 @@ import { replier } from '../lib/clamp';
 import { libellesTrame } from '../lib/libelles-trame';
 interface Props { text: string; id: string; lang?: string; sentences?: number; label?: string; class?: string }
 const { text, id, lang = 'en', sentences = 2, label, class: cls = '' } = Astro.props;
-const { tete, suite } = replier(text, { phrases: sentences });
+// Valeurs live (<span data-lv>, testeurs du 2026-11-14) : mises de côté pendant le découpage (« 13. November »
+// dans un span ne doit pas finir une phrase), puis remises ; le reste du texte est échappé.
+const spans: string[] = [];
+const plat = text.replace(/<span data-(?:lv|rang)=[^>]*>[^<]*<\/span>/g, (m) => `\uE000${spans.push(m) - 1}\uE001`);
+const esc = (x: string) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const remettre = (x: string) => esc(x).replace(/\uE000(\d+)\uE001/g, (_, i) => spans[Number(i)]);
+const { tete, suite } = replier(plat, { phrases: sentences });
 ---
 <div class={`clamp ${cls}`}>
   {suite && <input type="checkbox" id={id} class="clamp-toggle" />}
-  <p class="text-navy-800">{tete}{suite && <span class="clamp-rest"> {suite}</span>}</p>
+  <p class="text-navy-800"><Fragment set:html={remettre(tete)} />{suite && <span class="clamp-rest"> <Fragment set:html={remettre(suite)} /></span>}</p>
   {suite && <label for={id} class="clamp-more">{label ?? libellesTrame(lang).lireTout} ▾</label>}
 </div>

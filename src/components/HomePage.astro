@@ -21,16 +21,16 @@ const { lang } = Astro.props;
 const x = HOME[lang];
 const path = route('home', lang);
 const h = helpers(lang);
-const faqs = x.faqs(h);
+const faqs = x.faqs(h).map((f) => ({ ...f, a: f.a.replace(/<[^>]+>/g, '') }));
 const sources = sourceList(HOME.sources, lang);
 const jsonLd = [websiteSchema(lang), organizationSchema(lang), webPageSchema({ name: x.h1, description: x.description, path, lang }), webApplicationSchema({ name: x.h1, description: x.description, path, lang }), faqSchema(faqs, lang)];
 const koeln = raw('KÖLN').uuid;
 const featured = FEATURED.map((f) => compact(raw(f.api)));
 const featuredLinks = Object.fromEntries(FEATURED.map((f) => [raw(f.api).uuid, route(`st-${f.id}`, lang)]));
 const rivers = Object.fromEntries(RIVERS.map((r) => [r.api, r[lang]]));
-const indep = { de: 'Unabhängige Seite, kein Angebot der WSV oder einer Behörde. Hochwasserwarnungen finden Sie bei den', en: 'Independent site, not a service of the WSV or any authority. Flood warnings are issued by the' }[lang];
+const indep = { de: 'Unabhängige Seite, kein Angebot der Wasserstraßen- und Schifffahrtsverwaltung (WSV) oder einer anderen Behörde. Hochwasserwarnungen finden Sie bei den', en: 'Independent site, not a service of the German waterways administration (WSV) or any other authority. Flood warnings are issued by the' }[lang];
 const indep2 = { de: 'Hochwasserzentralen der Länder', en: 'German state flood centres' }[lang];
-const capt = { de: 'Die zwölf meistgesuchten Pegel (Keyword Planner, November 2026).', en: 'The twelve most searched gauges (Keyword Planner, November 2026).' }[lang];
+const capt = { de: 'Die zwölf meistgesuchten Pegel (nach Google-Suchanfragen, November 2026).', en: 'The twelve most searched gauges (by Google searches, November 2026).' }[lang];
 ---
 <PageLayout title={x.title} description={x.description} lang={lang} jsonLd={jsonLd} faqs={faqs} sources={sources}>
   <header class="mb-4">
@@ -66,3 +66,8 @@ const capt = { de: 'Die zwölf meistgesuchten Pegel (Keyword Planner, November 2
     {x.sections(h).map((s) => <details class="fold"><summary><h3 class="fold-h">{s.title}</h3></summary><div class="pb-4"><Body html={s.html} href={path} lang={lang} /></div></details>)}
   </section>
 </PageLayout>
+<script>
+  // Une seule valeur par station : les <span data-lv> du HTML (Stand du build) prennent la lecture live.
+  import { initLiveDom } from '../lib/live-dom';
+  initLiveDom();
+</script>

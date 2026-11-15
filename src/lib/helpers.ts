@@ -6,6 +6,9 @@ import P from '../data/params-2026.json';
 import { raw, compact, FETCHED_AT, featuredById } from './pegel';
 import { delta24, lage, LAGE_TEXT, tendenz, TENDENZ_TEXT } from './engine/pegel';
 import { quand } from './live';
+import { liveSpan } from './live-fmt';
+import { series } from './pegel';
+import type { St } from './engine/pegel';
 
 const esc = (s: string | number) => String(s).replace(/&(?!(?:[a-z]+|#\d+);)/g, '&amp;').replace(/</g, '&lt;');
 type Src = { url: string; label: Record<Lang, string> };
@@ -38,8 +41,17 @@ export function helpers(lang: Lang): Helpers {
     lang, t: (de, en) => (lang === 'de' ? de : en), n,
     cm: (x) => `${n(x)} cm`, m: (x) => `${n(x / 100, 2)} m`,
     st: (api) => raw(api), k: (api) => compact(raw(api)),
-    lage: (api) => { const s = compact(raw(api)); return LAGE_TEXT[lage(s.v, s)][lang]; },
-    trend: (api) => { const s = compact(raw(api)); const d = delta24(s.v, s.p); return d === null ? TENDENZ_TEXT.unbekannt[lang] : `${d > 0 ? '+' : d < 0 ? '−' : '±'}${n(Math.abs(d))} cm (${TENDENZ_TEXT[tendenz(d)][lang]})`; },
+    lage: (api) => { const s = compact(raw(api)); return liveSpan(s.u, 'lage', rec(s), lang, { k: kennOf(s) }); },
+    trend: (api) => { const s = compact(raw(api)); return liveSpan(s.u, 'd', rec(s), lang); },
+    vv: (s) => liveSpan(s.u, 'v', rec(s), lang),
+    lg: (s) => liveSpan(s.u, 'lage', rec(s), lang, { k: kennOf(s) }),
+    vm: (s) => liveSpan(s.u, 'm', rec(s), lang),
+    wt: (s) => liveSpan(s.u, 't', rec(s), lang),
+    nhn: (s) => liveSpan(s.u, 'nhn', rec(s), lang, { pnp: s.pnp! }),
+    rinne: (s) => liveSpan(s.u, 'rinne', rec(s), lang, { ref: s.glw!, tu: s.tu! }),
+    vs: (s, ref) => liveSpan(s.u, 'vs', rec(s), lang, { ref }),
+    lo: (api) => { const s = compact(raw(api)); const r = range30(s.u); return liveSpan(s.u, 'lo', rec(s), lang, { lo: r.lo }); },
+    hi: (api) => { const s = compact(raw(api)); const r = range30(s.u); return liveSpan(s.u, 'hi', rec(s), lang, { hi: r.hi }); },
     date: (iso) => dateTxt(iso, lang), when: (iso) => quand(iso, lang), snap: quand(FETCHED_AT, lang),
     a: (id, text) => link(id, text, lang), src: (key, text) => srcLink(key, lang, text), ext,
     table: (hd, rows, cap) => table(hd, rows, cap, lang), box, mini,
@@ -47,6 +59,12 @@ export function helpers(lang: Lang): Helpers {
     stLink: (id, text) => link(`st-${id}`, text ?? `${lang === 'de' ? 'Pegel ' : ''}${featuredById(id)[lang]}`, lang),
   };
 }
+
+const rec = (s: St) => ({ v: s.v, t: s.t, p: s.p });
+/** Kennwerte d'une station pour l'einordnung côté navigateur (data-k). */
+export const kennOf = (s: St) => Object.fromEntries(Object.entries({ mw: s.mw, mnw: s.mnw, mhw: s.mhw, hhw: s.hhw, nnw: s.nnw, m1: s.m1, m2: s.m2 }).filter(([, x]) => x !== undefined));
+/** Plage des 30 derniers jours, en moyennes de 2 h : les mêmes chiffres que la courbe (Verlauf). */
+export function range30(u: string) { const v = series(u).map((x) => x[1]); return { lo: Math.min(...v), hi: Math.max(...v) }; }
 
 const KENN: Array<[string, { de: string; en: string }]> = [
   ['NNW', { de: 'Niedrigster bekannter Stand (NNW)', en: 'Lowest level on record (NNW)' }],
@@ -66,10 +84,12 @@ export function kennTable(api: string, lang: Lang): string {
     const v = s.cv[k];
     if (v === undefined) continue;
     const occ = s.occ[k] ? s.occ[k].map((o) => dateTxt(o, lang)).join(lang === 'de' ? ' und ' : ' and ') : s.span[k] ? `${s.span[k][0].slice(0, 4)}–${s.span[k][1].slice(0, 4)}` : '–';
-    rows.push([l[lang], `${formatNumber(v, 0, lang)} cm`, `${v - s.cur.v >= 0 ? '+' : '−'}${formatNumber(Math.abs(v - s.cur.v), 0, lang)} cm`, occ]);
+    // Testeurs du 2026-11-14 : « +71 cm » se lisait à l'envers ; en mots, et relu avec la valeur live.
+    rows.push([l[lang], `${formatNumber(v, 0, lang)} cm`, liveSpan(s.uuid, 'ab', { v: s.cur.v, t: s.cur.t, p: s.prev?.v ?? null }, lang, { ref: v }), occ]);
   }
   if (s.cv.TuGLW !== undefined) rows.push([lang === 'de' ? 'Solltiefe der Fahrrinne bei GlW (TuGLW)' : 'Fairway target depth at GlW (TuGLW)', `${formatNumber(s.cv.TuGLW, 0, lang)} cm`, '–', '–']);
-  const hd = lang === 'de' ? ['Kennwert', 'Wert', 'Abstand zur Momentaufnahme', 'Datum oder Zeitraum'] : ['Reference value', 'Value', 'Distance from the snapshot', 'Date or period'];
-  const cap = lang === 'de' ? `Amtliche Kennwerte laut PEGELONLINE; Momentaufnahme ${formatNumber(s.cur.v, 0, lang)} cm, ${quand(s.cur.t, lang)}.` : `Official reference values from PEGELONLINE; snapshot ${formatNumber(s.cur.v, 0, lang)} cm, ${quand(s.cur.t, lang)}.`;
+  const hd = lang === 'de' ? ['Kennwert', 'Wert', 'Lage zum aktuellen Stand', 'Datum oder Zeitraum'] : ['Reference value', 'Value', 'Compared with the current level', 'Date or period'];
+  const r0 = { v: s.cur.v, t: s.cur.t, p: s.prev?.v ?? null };
+  const cap = lang === 'de' ? `Amtliche Kennwerte laut PEGELONLINE; aktueller Stand ${liveSpan(s.uuid, 'v', r0, lang)}, Stand: ${liveSpan(s.uuid, 't', r0, lang)}.` : `Official reference values from PEGELONLINE; current level ${liveSpan(s.uuid, 'v', r0, lang)}, as of ${liveSpan(s.uuid, 't', r0, lang)}.`;
   return table(hd, rows, cap, lang);
 }

@@ -23,8 +23,13 @@ export interface Helpers {
   k: (api: string) => St;
   /** Lage en mots. */
   lage: (api: string) => string;
-  /** « +13 cm (steigend) ». */
+  /** « +13 cm (steigend) », en <span data-lv> relu en direct. */
   trend: (api: string) => string;
+  /** Niveau d'une station (« 82 cm »), heure de mesure, niveau en m, plan d'eau ü. NHN, écart à un repère :
+   *  <span data-lv> écrit avec la momentaufnahme, remplacé par la lecture live (testeurs du 2026-11-14). */
+  vv: (s: St) => string; lg: (s: St) => string; vm: (s: St) => string; wt: (s: St) => string; nhn: (s: St) => string; vs: (s: St, ref: number) => string; rinne: (s: St) => string;
+  /** Plus bas et plus haut 2-Stunden-Mittel des 30 derniers jours (les chiffres de la courbe). */
+  lo: (api: string) => string; hi: (api: string) => string;
   /** Date en toutes lettres (« 17. August 2002 ») ; accepte AAAA, AAAA-MM et AAAA-MM-JJ. */
   date: (iso: string) => string;
   /** Heure et date de la momentaufnahme. */

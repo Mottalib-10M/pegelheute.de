@@ -14,13 +14,25 @@ export default function NumberField({ id, label, value, onChange, unit = '', min
   const guardMouseUp = useRef(false);
   useLayoutEffect(() => { if (selectPending.current) { selectPending.current = false; input.current?.select(); } });
   const display = focused ? raw : (value === 0 ? '' : formatNumber(value, Number.isInteger(value) ? 0 : decimals, lang)); // « 6 semaines », pas « 6.0 » (travel-vaccines, 2026-10-24)
-  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const filtered = e.target.value.replace(/[^0-9.,\s-]/g, '');
+  const saisir = useCallback((texte: string) => {
+    const filtered = texte.replace(/[^0-9.,\s-]/g, '');
     setRaw(filtered);
     const n = parseLocaleNumber(filtered);
     setOver(n > max);
     onChange(Math.min(n, max));
   }, [onChange, max]);
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => saisir(e.target.value), [saisir]);
+  // Saisie avant l'hydratation (île `client:visible` sous la ligne de flottaison, pegelheute.de 2026-11-14) :
+  // le lecteur fait défiler, touche le champ et l'efface pendant que le JavaScript de l'île arrive ; ni le focus
+  // ni la frappe n'ont alors atteint React, qui réécrivait au rendu suivant la valeur du build (« 450 » revenait
+  // dans un champ vidé). Au montage, le champ reprend ce que le DOM contient vraiment, et le focus.
+  useLayoutEffect(() => {
+    const el = input.current;
+    if (!el) return;
+    const actif = document.activeElement === el;
+    if (el.value !== display) { if (actif) setFocused(true); saisir(el.value); }
+    else if (actif) { setRaw(value === 0 ? '' : String(value)); setFocused(true); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- une seule fois, au montage
   const handleFocus = useCallback(() => { setRaw(value === 0 ? '' : String(value)); setFocused(true); selectPending.current = true; guardMouseUp.current = true; }, [value]);
   const handleBlur = useCallback(() => {
     guardMouseUp.current = false; setFocused(false); if (value < min) onChange(min); if (value > max) onChange(max); }, [value, min, max, onChange]);

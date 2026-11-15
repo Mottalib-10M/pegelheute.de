@@ -55,6 +55,6 @@ const out = { source: 'PEGELONLINE REST-API v2, Wasserstraßen- und Schifffahrts
 writeFileSync(new URL('../src/data/pegel.json', import.meta.url), JSON.stringify(out));
 // Petit extrait pour les mini-calculs des guides (bundle navigateur) : stations du Rhin à repères + stations à page.
 const keep = stations.filter((s) => FEATURED.includes(s.name) || (s.water === 'RHEIN' && (s.cv.M_I !== undefined || s.cv.GlW !== undefined)));
-const mini = keep.map((s) => ({ name: s.name, w: s.water, km: s.km, v: s.cur.v, pnp: s.pnp?.v ?? null, pu: s.pnp?.unit ?? '', glw: s.cv.GlW ?? null, tu: s.cv.TuGLW ?? null, m1: s.cv.M_I ?? null, m2: s.cv.M_II ?? null }));
+const mini = keep.map((s) => ({ u: s.uuid, name: s.name, w: s.water, km: s.km, v: s.cur.v, pnp: s.pnp?.v ?? null, pu: s.pnp?.unit ?? '', glw: s.cv.GlW ?? null, tu: s.cv.TuGLW ?? null, m1: s.cv.M_I ?? null, m2: s.cv.M_II ?? null }));
 writeFileSync(new URL('../src/data/mini.json', import.meta.url), JSON.stringify({ fetchedAt: out.fetchedAt, stations: mini }));
 console.log(`${stations.length} Pegel, ${stations.filter((s) => s.prev).length} mit Wert vor 24 h, ${Object.keys(series).length} Verläufe`);

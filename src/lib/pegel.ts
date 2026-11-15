@@ -57,7 +57,7 @@ const OBERWASSER = /\s(OW|OP)$/;
 export function compact(s: RawSt): St {
   const c = OBERWASSER.test(s.name) ? { ...s.cv, MNW: undefined, MW: undefined, MHW: undefined } as Record<string, number | undefined> : s.cv;
   return { u: s.uuid, n: nom(s.name), w: s.water, km: s.km, v: s.cur.v, t: s.cur.t, p: s.prev?.v ?? null, pnp: s.pnp?.v ?? null, pu: s.pnp?.unit ?? '', s: s.cur.mnwMhw,
-    mw: c.MW, mnw: c.MNW, mhw: c.MHW, hhw: c.HHW, nnw: c.NNW, hsw: c.HSW, m1: c.M_I, m2: c.M_II, glw: c.GlW, tu: c.TuGLW };
+    mw: c.MW, mnw: c.MNW, mhw: c.MHW, hhw: c.HHW, nnw: c.NNW, hsw: c.HSW, m1: c.M_I, m2: c.M_II, glw: c.GlW, tu: c.TuGLW, ...(s.occ.NNW?.[0] ? { nnwd: s.occ.NNW[0] } : {}) };
 }
 export const byKm = (a: { km: number | null }, b: { km: number | null }) => (a.km ?? 1e9) - (b.km ?? 1e9);
 /** Ordre d'écoulement (amont → aval) : Donau et Mosel comptent les km depuis l'embouchure ; la Weser a deux comptages

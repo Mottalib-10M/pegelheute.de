@@ -14,6 +14,8 @@ export interface St extends Kenn {
   pnp: number | null; pu: string;
   /** Classement officiel PEGELONLINE face à MNW/MHW : low, normal, high, unknown. */
   s: string;
+  /** Date (AAAA-MM-JJ) du plus bas connu (NNW), si PEGELONLINE la publie. */
+  nnwd?: string;
 }
 
 export type LageId = 'ueberHHW' | 'ueberM2' | 'ueberM1' | 'ueberMHW' | 'unterNNW' | 'unterMNW' | 'ueberMW' | 'unterMW' | 'unbekannt';
@@ -91,4 +93,25 @@ export function schifffahrt(v: number, k: Kenn): 'frei' | 'eingeschraenkt' | 'ge
   if (k.m2 !== undefined && v >= k.m2) return 'gesperrt';
   if (v > k.m1) return 'eingeschraenkt';
   return 'frei';
+}
+
+/** Verdict en mots de tous les jours, sans sigle (testeurs naïfs du 2026-11-14) : la première ligne du résultat. */
+export const VERDIKT: Record<LageId, { de: string; en: string }> = {
+  ueberHHW: { de: 'Extremes Hochwasser: höher als je zuvor gemessen', en: 'Extreme flood: higher than ever measured' },
+  ueberM2: { de: 'Hochwasser: über der zweiten Hochwassermarke, Schifffahrt verboten', en: 'Flood: above the second flood mark, shipping prohibited' },
+  ueberM1: { de: 'Hochwasser: über der ersten Hochwassermarke, Schifffahrt eingeschränkt', en: 'Flood: above the first flood mark, shipping restricted' },
+  ueberMHW: { de: 'Hoch: über dem typischen Jahreshochwasser', en: 'High: above the typical yearly flood' },
+  ueberMW: { de: 'Normal: etwas über dem üblichen Stand, kein Hochwasser', en: 'Normal: a little above the usual level, no flood' },
+  unterMW: { de: 'Eher niedrig: unter dem üblichen Stand, kein Hochwasser', en: 'Rather low: below the usual level, no flood' },
+  unterMNW: { de: 'Niedrig: tiefer als im typischen Jahrestief, kein Hochwasser', en: 'Low: lower than the typical yearly low, no flood' },
+  unterNNW: { de: 'Rekordtief: so niedrig wie nie zuvor gemessen oder tiefer', en: 'Record low: as low as ever measured, or lower' },
+  unbekannt: { de: 'Keine Einordnung möglich: Für diesen Pegel gibt es keine amtlichen Vergleichswerte', en: 'No rating possible: this gauge has no official reference values' },
+};
+
+/** Abstand en cm au plus bas connu (NNW) quand l'eau en est à 10 cm ou moins ; null sinon. */
+export const NAHE_NNW = 10;
+export function naheRekordtief(v: number, k: Kenn): number | null {
+  if (k.nnw === undefined) return null;
+  const a = Math.round(v - k.nnw);
+  return a > 0 && a <= NAHE_NNW ? a : null;
 }

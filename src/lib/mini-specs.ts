@@ -5,7 +5,7 @@ import M from '../data/mini.json';
 import { abstand, fahrrinne, schifffahrt, spiegel, stundenBis } from './engine/pegel';
 import { formatNumber } from './format';
 
-type Mi = { name: string; w: string; km: number; v: number; pnp: number | null; pu: string; glw: number | null; tu: number | null; m1: number | null; m2: number | null };
+type Mi = { u: string; name: string; w: string; km: number; v: number; pnp: number | null; pu: string; glw: number | null; tu: number | null; m1: number | null; m2: number | null };
 const ST = (M as { stations: Mi[] }).stations;
 const NOMS: Record<string, string> = { KÖLN: 'Köln', DÜSSELDORF: 'Düsseldorf', WÜRZBURG: 'Würzburg', 'MAGDEBURG-STROMBRÜCKE': 'Magdeburg-Strombrücke', 'PASSAU DONAU': 'Passau Donau', 'DUISBURG-RUHRORT': 'Duisburg-Ruhrort', 'Basel-Rheinhalle': 'Basel-Rheinhalle' };
 const nm = (s: Mi) => NOMS[s.name] ?? s.name.charAt(0) + s.name.slice(1).toLowerCase();
@@ -24,7 +24,8 @@ const SPECS: Record<string, (lang: string) => MiniSpec> = {
     return {
       title: en ? 'Gauge reading → height of the water surface' : 'Pegelwert → Höhe des Wasserspiegels',
       cta: en ? 'Read the live value of your gauge' : 'Live-Wert Ihres Pegels ansehen',
-      exemple: en ? 'Example for Cologne at the reading of the snapshot' : 'Beispiel für Köln mit dem Wert der Momentaufnahme',
+      exemple: (v) => { const s = MIT_PNP[v.st] ?? MIT_PNP[0]; return en ? `Example for ${nm(s)} at its current reading` : `Beispiel für ${nm(s)} mit dem aktuellen Pegelwert`; },
+      live: { wert: 'w', uuid: (v) => (MIT_PNP[v.st] ?? MIT_PNP[0])?.u, snap: (v) => (MIT_PNP[v.st] ?? MIT_PNP[0])?.v },
       inputs: [
         { id: 'st', label: en ? 'Gauge' : 'Pegel', def: idx(MIT_PNP, 'KÖLN'), options: MIT_PNP.map((s, i) => ({ value: String(i), label: nm(s) })) },
         { id: 'w', label: en ? 'Reading' : 'Pegelwert', def: MIT_PNP[idx(MIT_PNP, 'KÖLN')]?.v ?? 100, unit: 'cm', max: 1500 },
@@ -45,7 +46,8 @@ const SPECS: Record<string, (lang: string) => MiniSpec> = {
     return {
       title: en ? 'Rhine fairway depth from the gauge reading' : 'Fahrrinnentiefe am Rhein aus dem Pegelwert',
       cta: en ? 'Kaub gauge live' : 'Pegel Kaub live',
-      exemple: en ? 'Example for Kaub at the reading of the snapshot' : 'Beispiel für Kaub mit dem Wert der Momentaufnahme',
+      exemple: (v) => { const s = RHEIN_GLW[v.st] ?? RHEIN_GLW[0]; return en ? `Example for ${nm(s)} at its current reading` : `Beispiel für ${nm(s)} mit dem aktuellen Pegelwert`; },
+      live: { wert: 'w', uuid: (v) => (RHEIN_GLW[v.st] ?? RHEIN_GLW[0])?.u, snap: (v) => (RHEIN_GLW[v.st] ?? RHEIN_GLW[0])?.v },
       inputs: [
         { id: 'st', label: en ? 'Gauge' : 'Pegel', def: k, options: RHEIN_GLW.map((s, i) => ({ value: String(i), label: rk(s, en) })) },
         { id: 'w', label: en ? 'Reading' : 'Pegelwert', def: RHEIN_GLW[k]?.v ?? 100, unit: 'cm', max: 1500 },
@@ -68,7 +70,8 @@ const SPECS: Record<string, (lang: string) => MiniSpec> = {
     return {
       title: en ? 'How far to Rhine flood marks I and II?' : 'Wie weit bis Hochwassermarke I und II am Rhein?',
       cta: en ? 'Cologne gauge live' : 'Pegel Köln live',
-      exemple: en ? 'Example for Cologne at the reading of the snapshot' : 'Beispiel für Köln mit dem Wert der Momentaufnahme',
+      exemple: (v) => { const s = RHEIN_M[v.st] ?? RHEIN_M[0]; return en ? `Example for ${nm(s)} at its current reading` : `Beispiel für ${nm(s)} mit dem aktuellen Pegelwert`; },
+      live: { wert: 'w', uuid: (v) => (RHEIN_M[v.st] ?? RHEIN_M[0])?.u, snap: (v) => (RHEIN_M[v.st] ?? RHEIN_M[0])?.v },
       inputs: [
         { id: 'st', label: en ? 'Reference gauge' : 'Richtpegel', def: k, options: RHEIN_M.map((s, i) => ({ value: String(i), label: rk(s, en) })) },
         { id: 'w', label: en ? 'Reading' : 'Pegelwert', def: RHEIN_M[k]?.v ?? 100, unit: 'cm', max: 1500 },
@@ -81,7 +84,7 @@ const SPECS: Record<string, (lang: string) => MiniSpec> = {
         const txt = { frei: en ? 'No restriction (below mark I)' : 'Frei (unter Marke I)', eingeschraenkt: en ? 'Restricted (between mark I and II)' : 'Eingeschränkt (zwischen Marke I und II)', gesperrt: en ? 'Prohibited (mark II reached)' : 'Verboten (Marke II erreicht)', ohneMarken: '–' }[st];
         return { head: [en ? 'Shipping on this section' : 'Schifffahrt auf diesem Abschnitt', txt],
           rows: [[en ? 'Mark I' : 'Marke I', cm(s.m1!, en)], [en ? 'Distance to mark I' : 'Abstand zu Marke I', a1 > 0 ? cm(a1, en) : (en ? 'reached' : 'erreicht')], [en ? 'Mark II' : 'Marke II', s.m2 === null ? '–' : cm(s.m2, en)], [en ? 'Distance to mark II' : 'Abstand zu Marke II', a2 === null ? '–' : a2 > 0 ? cm(a2, en) : (en ? 'reached' : 'erreicht')]],
-          note: en ? 'Marks and rules: RheinSchPV § 10.01, values as published by PEGELONLINE.' : 'Marken und Regeln: RheinSchPV § 10.01, Werte wie bei PEGELONLINE veröffentlicht.' };
+          note: en ? 'Marks as published by PEGELONLINE; rules: Rhine Shipping Police Regulations, § 10.01.' : 'Marken wie bei PEGELONLINE veröffentlicht; Regeln: Rheinschifffahrtspolizeiverordnung, § 10.01.' };
       },
     };
   },

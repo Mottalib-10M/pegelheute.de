@@ -20,7 +20,7 @@ const x = page[lang];
 const h = helpers(lang);
 const path = route(page.id, lang);
 const grp = GROUPS.find((g) => ({ station: 'stationen', river: 'fluesse', guide: 'wissen' } as const)[page.kind] === g.id)!;
-const faqs = x.faqs(h);
+const faqs = x.faqs(h).map((f) => ({ ...f, a: f.a.replace(/<[^>]+>/g, '') }));
 const jsonLd = [webApplicationSchema({ name: x.h1, description: x.description, path, lang }), articleSchema({ title: x.h1, description: x.description, path, lang }), webPageSchema({ name: x.h1, description: x.description, path, lang })];
 const crumbs: Array<{ label: string; href?: string }> = [];
 let riverId: RiverId | undefined;
@@ -40,7 +40,7 @@ const sources = sourceList(page.sources, lang);
 const featuredLinks = Object.fromEntries(FEATURED.map((f) => [raw(f.api).uuid, route(`st-${f.id}`, lang)]));
 const initial = stationUuid ?? (riverId ? (FEATURED.find((f) => f.river === riverId) ? raw(FEATURED.find((f) => f.river === riverId)!.api).uuid : compactOf(riverId)[Math.floor(compactOf(riverId).length / 2)].u) : undefined);
 const st = stationUuid ? compact(raw(featuredById(page.ref!).api)) : undefined;
-const indep = { de: 'Unabhängige Seite, kein Angebot der WSV oder einer Behörde. Hochwasserwarnungen finden Sie bei den', en: 'Independent site, not a service of the WSV or any authority. Flood warnings are issued by the' }[lang];
+const indep = { de: 'Unabhängige Seite, kein Angebot der Wasserstraßen- und Schifffahrtsverwaltung (WSV) oder einer anderen Behörde. Hochwasserwarnungen finden Sie bei den', en: 'Independent site, not a service of the German waterways administration (WSV) or any other authority. Flood warnings are issued by the' }[lang];
 const indep2 = { de: 'Hochwasserzentralen der Länder', en: 'German state flood centres' }[lang];
 const miniHref = route('home', lang);
 const rivApi = riverId ? riverById(riverId).api : undefined;
@@ -53,13 +53,18 @@ const capt = riverId ? { de: `Alle ${compactOf(riverId).length} Pegel mit Wasser
       <p class="mt-2 text-base text-navy-700 sm:text-lg" set:html={x.intro(h)} />
       <p data-chrome class="mt-1 text-sm text-navy-600">{indep} <a href={SOURCES(lang).hochwasserzentralen.url} target="_blank" rel="nofollow noopener" class="underline">{indep2}</a>.</p>
     </header>
-    <div data-outil data-chrome class="mb-4">
+    <div id="rechner" data-outil data-chrome class="mb-4 scroll-mt-4">
       <Tool kind={page.tool} lang={lang} river={page.kind === 'guide' ? 'alle' : riverId} initial={initial} idPrefix={`p${page.order}`} miniHref={miniHref} />
     </div>
     {st && stationUuid && <Verlauf client:visible lang={lang} uuid={stationUuid} serie={series(stationUuid)} kenn={st} name={x.nav} />}
-    <p class="mb-6 text-sm text-navy-600">{lang === 'de' ? 'Erstellt von' : 'Prepared by'} <a href={route('about', lang)} class="underline hover:text-navy-900">{AUTHOR_NAME}</a> · <a href={route('method', lang)} class="underline hover:text-navy-900">{label('method', lang)}</a> · {lang === 'de' ? 'Momentaufnahme' : 'snapshot'} {h.snap}</p>
+    <p class="mb-6 text-sm text-navy-600">{lang === 'de' ? 'Erstellt von' : 'Prepared by'} <a href={route('about', lang)} class="underline hover:text-navy-900">{AUTHOR_NAME}</a> · <a href={route('method', lang)} class="underline hover:text-navy-900">{label('method', lang)}</a> · {lang === 'de' ? 'Daten: PEGELONLINE, beim Öffnen der Seite live gelesen' : 'Data: PEGELONLINE, read live when the page opens'}</p>
     <Clamp text={x.resume(h)} lang={lang} id={`clamp-${page.id}`} class="mb-8" />
     <Body html={x.body(h)} href={miniHref} lang={lang} />
     {page.kind === 'river' && rivApi && riverId && <div data-chrome><PegelTabelle client:visible lang={lang} stations={compactOf(riverId)} waters={[rivApi]} links={featuredLinks} caption={capt} /></div>}
   </article>
 </PageLayout>
+<script>
+  // Une seule valeur par station : les <span data-lv> du HTML (Stand du build) prennent la lecture live.
+  import { initLiveDom } from '../lib/live-dom';
+  initLiveDom();
+</script>

@@ -1,9 +1,11 @@
 /** Classement des pegels par leur place entre MNW (0 %) et MHW (100 %) : où l'eau est haute, où elle est basse, en direct. */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SelectField from '../ui/SelectField';
 import { formatNumber, formatPercent, type Lang } from '../../lib/format';
-import { liveWaters, quand } from '../../lib/live';
+import { ensureAll, quand } from '../../lib/live';
+import { useLiveReader } from '../../lib/use-live';
 import { anteil, lage, LAGE_TEXT, type St } from '../../lib/engine/pegel';
+import { rangText, type RangFeld } from '../../lib/rang';
 
 interface Props { lang: Lang; stations: St[]; rivers: Record<string, string>; idPrefix?: string; initialOrder?: 'hoch' | 'tief' }
 
@@ -11,22 +13,25 @@ export default function Rangliste({ lang, stations, rivers, idPrefix = 'rl', ini
   const en = lang === 'en';
   const [fluss, setFluss] = useState('alle');
   const [ordre, setOrdre] = useState<string>(initialOrder);
-  const [live, setLive] = useState<Record<string, { v: number; t: string; s: string }>>({});
-  useEffect(() => {
-    const ctl = new AbortController();
-    liveWaters(Object.keys(rivers), ctl.signal).then(setLive).catch(() => {});
-    return () => ctl.abort();
-  }, []);
-  const rows = useMemo(() => stations
+  // Même magasin que les textes de la page : le chapeau de « Hochwasser aktuell » cite le même premier pegel.
+  const lire = useLiveReader();
+  useEffect(() => { ensureAll(); }, []);
+  const rows = stations
     .filter((s) => fluss === 'alle' || s.w === fluss)
-    .map((s) => { const v = live[s.u]?.v ?? s.v; return { s, v, t: live[s.u]?.t ?? s.t, a: anteil(v, s) }; })
+    .map((s) => { const x = lire(s.u); const v = x?.v ?? s.v; return { s, v, t: x?.t ?? s.t, a: anteil(v, s) }; })
     .filter((r) => r.a !== null)
     .sort((a, b) => (ordre === 'hoch' ? b.a! - a.a! : a.a! - b.a!))
-    .slice(0, 12), [stations, fluss, ordre, live]);
-  const n = Object.keys(live).length;
+    .slice(0, 12);
+  const n = stations.filter((s) => lire(s.u)).length;
+  // Le texte de la page (chapeau, résumé) suit la même lecture : premier pegel et nombre au-dessus du MHW.
+  useEffect(() => {
+    if (!n) return;
+    const vals = stations.map((s) => ({ s, v: lire(s.u)?.v ?? s.v }));
+    document.querySelectorAll<HTMLElement>('[data-rang]').forEach((el) => { const x = rangText(el.dataset.rang as RangFeld, vals, lang); if (x !== null) el.textContent = x; });
+  });
   const opts = [{ value: 'alle', label: en ? 'All six rivers' : 'Alle sechs Flüsse' }, ...Object.entries(rivers).map(([k, v]) => ({ value: k, label: v }))];
   const ord = [{ value: 'hoch', label: en ? 'Highest first (closest to MHW)' : 'Höchste zuerst (nahe MHW)' }, { value: 'tief', label: en ? 'Lowest first (closest to MNW)' : 'Niedrigste zuerst (nahe MNW)' }];
-  const H = en ? ['#', 'Gauge', 'River', 'Level', 'Between MNW and MHW', 'Where it stands'] : ['#', 'Pegel', 'Fluss', 'Stand', 'Zwischen MNW und MHW', 'Einordnung'];
+  const H = en ? ['Rank', 'Gauge', 'River', 'Level', 'Between typical low (0%) and typical flood (100%)', 'Where it stands'] : ['Platz', 'Pegel', 'Fluss', 'Stand', 'Zwischen typischem Tief (0 %) und typischem Hochwasser (100 %)', 'Einordnung'];
   const top = rows[0];
   return (
     <div className="not-prose rounded-xl border border-accent-200 bg-white p-4 shadow-sm sm:p-5">
@@ -39,8 +44,9 @@ export default function Rangliste({ lang, stations, rivers, idPrefix = 'rl', ini
           {top && <>
             <p className="text-sm font-medium text-navy-600">{ordre === 'hoch' ? (en ? 'Highest relative level' : 'Relativ höchster Stand') : (en ? 'Lowest relative level' : 'Relativ niedrigster Stand')}</p>
             <p className="tabular-nums mt-1 text-3xl font-bold text-navy-900">{top.s.n}: {formatNumber(top.v, 0, lang)} cm</p>
-            <p className="mt-1 text-sm text-navy-700">{formatPercent(top.a!, 0, lang)} {en ? 'of the way from MNW to MHW' : 'des Wegs von MNW zu MHW'} · {LAGE_TEXT[lage(top.v, top.s)][lang]}</p>
-            <p className="mt-1 text-xs text-navy-600">{quand(top.t, lang)} · {n ? (en ? 'live from PEGELONLINE' : 'live von PEGELONLINE') : (en ? 'snapshot taken when the page was built' : 'Momentaufnahme beim Erstellen der Seite')}</p>
+            <p className="mt-1 text-sm text-navy-700">{formatPercent(top.a!, 0, lang)} {en ? 'of the way from the typical yearly low (MNW) to the typical yearly flood (MHW)' : 'des Wegs vom typischen Jahrestief (MNW) zum typischen Jahreshochwasser (MHW)'} · {LAGE_TEXT[lage(top.v, top.s)][lang]}</p>
+            <p className="mt-1 text-xs text-navy-600">{quand(top.t, lang)} · {n ? (en ? 'live from PEGELONLINE' : 'live von PEGELONLINE') : (en ? 'value when the page was built' : 'Stand beim Erstellen der Seite')}</p>
+            <p className="mt-2 text-xs text-navy-600">{en ? 'Where mean water sits between MNW and MHW differs from gauge to gauge: a gauge with a lower percentage can therefore already be above its mean water while another with a higher percentage is still below it.' : 'Wo das Mittelwasser zwischen MNW und MHW liegt, ist von Pegel zu Pegel verschieden: Ein Pegel mit kleinerem Prozentwert kann deshalb schon über seinem Mittelwasser stehen, während ein anderer mit größerem Prozentwert noch darunter liegt.'}</p>
           </>}
         </div>
       </div>

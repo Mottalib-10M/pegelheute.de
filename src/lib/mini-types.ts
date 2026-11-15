@@ -23,4 +23,7 @@ export interface MiniSpec {
    *  le composant pose la mention d'exemple ; une spec peut aussi s'en servir pour taire un verdict
    *  (« vous êtes éligible ») tant que les chiffres sont ceux de l'exemple. */
   run: (v: Record<string, number>, touched?: Record<string, boolean>) => MiniOut;
+  /** Valeur live (pegelheute.de, testeurs du 2026-11-14) : tant que le lecteur n'a pas tapé le champ `wert`, il prend
+   *  la lecture live de la station choisie (`uuid(v)`), la même que le chapeau et la boîte live de la page. */
+  live?: { wert: string; uuid: (v: Record<string, number>) => string | undefined; snap: (v: Record<string, number>) => number | undefined };
 }
